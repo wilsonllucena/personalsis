@@ -25,22 +25,30 @@ const List: React.FC = () => {
 	const [totalResults, setTotalResults] = useState(0);
 
 	// pagination setup
-	const resultsPerPage = 10;
+	const resultsPerPage = 2;
 
 	// pagination change control
 	function onPageChangeTable2(p: number) {
 		setPageTable(p);
 	}
+    const fetchData = async () => {
+        const response = await api.get("/leaners");
+        setLeaners(response.data);
+        setTotalResults(response.data.length);
+    };
+    
+	useEffect(() => {
+		fetchData();
+	}, []);
+
+    // const paginates = () => {
+	// 	setLeaners(leaners.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage));
+    // };
 
 	useEffect(() => {
-        const fetchData = async () => {
-            const response = await api.get("/leaners");
-            const results = response.data.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage);
-            setLeaners(results);
-            setTotalResults(response.data.length);
-        };
-		fetchData();
-	}, [pageTable]);
+        		setLeaners(leaners.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage));
+
+	}, [pageTable, leaners]);
 
 	return (
 		<>

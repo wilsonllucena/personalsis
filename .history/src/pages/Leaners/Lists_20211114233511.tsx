@@ -25,13 +25,14 @@ const List: React.FC = () => {
 	const [totalResults, setTotalResults] = useState(0);
 
 	// pagination setup
-	const resultsPerPage = 10;
+	const resultsPerPage = 2;
 
 	// pagination change control
 	function onPageChangeTable2(p: number) {
 		setPageTable(p);
 	}
 
+    
 	useEffect(() => {
         const fetchData = async () => {
             const response = await api.get("/leaners");

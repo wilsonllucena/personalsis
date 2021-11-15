@@ -12,16 +12,16 @@ import {
 	Pagination,
 } from "@windmill/react-ui";
 import { EditIcon, TrashIcon } from "../../icons";
+// import response from "../../utils/demo/tableData";
 import api from "../../services/apiClient";
-import { Link } from "react-router-dom";
 interface ILeaners {
-	id: number;
+    id: number;
 	name: string;
 	email: string;
 }
 const List: React.FC = () => {
-	const [leaners, setLeaners] = useState<ILeaners[]>([]);
 	const [pageTable, setPageTable] = useState(1);
+	const [leaners, setLeaners] = useState<ILeaners[]>([]);
 	const [totalResults, setTotalResults] = useState(0);
 
 	// pagination setup
@@ -32,34 +32,39 @@ const List: React.FC = () => {
 		setPageTable(p);
 	}
 
-	useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
             const response = await api.get("/leaners");
-            const results = response.data.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage);
-            setLeaners(results);
+            setLeaners(response.data);
             setTotalResults(response.data.length);
         };
-		fetchData();
-	}, [pageTable]);
+        fetchData();
+    }, []);
 
+	useEffect(() => {
+		setLeaners(
+			leaners.slice(
+				(pageTable - 1) * resultsPerPage,
+				pageTable * resultsPerPage
+			)
+		);
+	}, [leaners, pageTable]);
+    
 	return (
 		<>
-			<div className="flex items-center justify-between">
-				<PageTitle>Alunos cadastrados</PageTitle>
-				<Button className="bg-blue-600">
-                    <Link to="/app/leaner">+ Novo</Link></Button>
-			</div>
+			<PageTitle>Alunos cadastrados</PageTitle>
 			<TableContainer className="mb-8">
 				<Table>
 					<TableHeader>
 						<tr>
 							<TableCell>Nome</TableCell>
+							{/* <TableCell>Data</TableCell> */}
 							<TableCell>Ações</TableCell>
 						</tr>
 					</TableHeader>
 					<TableBody>
 						{leaners.map((leaner, i) => (
-							<TableRow key={i}>
+							<TableRow key={leaner.id}>
 								<TableCell>
 									<div className="flex items-center text-sm">
 										<div>
@@ -72,6 +77,13 @@ const List: React.FC = () => {
 										</div>
 									</div>
 								</TableCell>
+								{/* <TableCell>
+									<span className="text-sm">
+										{new Date(
+											user.date
+										).toLocaleDateString()}
+									</span>
+								</TableCell> */}
 								<TableCell>
 									<div className="flex items-center space-x-4">
 										<Button

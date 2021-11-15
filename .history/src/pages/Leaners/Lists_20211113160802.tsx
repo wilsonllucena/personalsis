@@ -31,23 +31,31 @@ const List: React.FC = () => {
 	function onPageChangeTable2(p: number) {
 		setPageTable(p);
 	}
+    const fetchData = async () => {
+        const response = await api.get("/leaners");
+        setLeaners(response.data);
+        setTotalResults(response.data.length);
+    };
+    
+	useEffect(() => {
+		fetchData();
+	}, []);
 
 	useEffect(() => {
-        const fetchData = async () => {
-            const response = await api.get("/leaners");
-            const results = response.data.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage);
-            setLeaners(results);
-            setTotalResults(response.data.length);
-        };
-		fetchData();
-	}, [pageTable]);
+		setLeaners(
+			leaners.slice(
+				(pageTable - 1) * resultsPerPage,
+				pageTable * resultsPerPage
+			)
+		);
+	}, [leaners, pageTable]);
 
 	return (
 		<>
 			<div className="flex items-center justify-between">
 				<PageTitle>Alunos cadastrados</PageTitle>
 				<Button className="bg-blue-600">
-                    <Link to="/app/leaner">+ Novo</Link></Button>
+                    <Link to="/leaner">+ Novo</Link></Button>
 			</div>
 			<TableContainer className="mb-8">
 				<Table>
@@ -59,7 +67,7 @@ const List: React.FC = () => {
 					</TableHeader>
 					<TableBody>
 						{leaners.map((leaner, i) => (
-							<TableRow key={i}>
+							<TableRow key={leaner.id}>
 								<TableCell>
 									<div className="flex items-center text-sm">
 										<div>

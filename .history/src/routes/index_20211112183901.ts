@@ -26,12 +26,7 @@ const routes = [
     isPrivate: true 
   },
   {
-    path: '/leaner', 
-    component: LeanerForm,
-    isPrivate: true 
-  },
-  {
-    path: '/leaner/:id', 
+    path: '/leaner/create', 
     component: LeanerForm,
     isPrivate: true 
   },

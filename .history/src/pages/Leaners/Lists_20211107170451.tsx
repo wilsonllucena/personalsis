@@ -13,7 +13,6 @@ import {
 } from "@windmill/react-ui";
 import { EditIcon, TrashIcon } from "../../icons";
 import api from "../../services/apiClient";
-import { Link } from "react-router-dom";
 interface ILeaners {
 	id: number;
 	name: string;
@@ -33,21 +32,31 @@ const List: React.FC = () => {
 	}
 
 	useEffect(() => {
-        const fetchData = async () => {
-            const response = await api.get("/leaners");
-            const results = response.data.slice((pageTable - 1) * resultsPerPage,pageTable * resultsPerPage);
-            setLeaners(results);
-            setTotalResults(response.data.length);
-        };
+		const fetchData = async () => {
+			const response = await api.get("/leaners");
+			setLeaners(response.data);
+			setTotalResults(response.data.length);
+		};
 		fetchData();
-	}, [pageTable]);
+	}, []);
+
+	useEffect(() => {
+		setLeaners(
+			leaners.slice(
+				(pageTable - 1) * resultsPerPage,
+				pageTable * resultsPerPage
+			)
+		);
+	}, [leaners, pageTable]);
 
 	return (
 		<>
+			{/* <PageTitle>Alunos cadastrados</PageTitle> */}
 			<div className="flex items-center justify-between">
-				<PageTitle>Alunos cadastrados</PageTitle>
-				<Button className="bg-blue-600">
-                    <Link to="/app/leaner">+ Novo</Link></Button>
+					<PageTitle>Alunos cadastrados</PageTitle>
+				<div className="flex space-x-4">
+					<Button>Novo</Button>
+				</div>
 			</div>
 			<TableContainer className="mb-8">
 				<Table>
@@ -59,7 +68,7 @@ const List: React.FC = () => {
 					</TableHeader>
 					<TableBody>
 						{leaners.map((leaner, i) => (
-							<TableRow key={i}>
+							<TableRow key={leaner.id}>
 								<TableCell>
 									<div className="flex items-center text-sm">
 										<div>

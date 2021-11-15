@@ -32,6 +32,7 @@ const List: React.FC = () => {
 		setPageTable(p);
 	}
 
+    
 	useEffect(() => {
         const fetchData = async () => {
             const response = await api.get("/leaners");
