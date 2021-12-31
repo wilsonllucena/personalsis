@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useState } from "react";
 
 import { Button, Input, Label, Select, Textarea } from "@windmill/react-ui";
 import { useParams } from "react-router-dom";
@@ -41,6 +41,12 @@ interface Leaner {
 	type_training: string;
 }
 
+interface Exercicie {
+    id: number;
+	name: string;
+	url: string;
+}
+
 const Form: React.FC = () => {
 	const { register, handleSubmit, setValue } = useForm<
 		Omit<ILeanerInputsForm, "id">
@@ -51,7 +57,8 @@ const Form: React.FC = () => {
 	const [leaner, setLeaner] = useState<Leaner>();
 	const [genders, setGenders] = useState<IOptionsSelect[]>([]);
 
-	// const [plans, setPlans] = useState<IOptionsSelect[]>([]);
+	const [categories, setCategories] = useState<IOptionsSelect[]>([]);
+    const [exercicies, setExercicies] = useState<Exercicie[]>([]);
 	// const [intensities, setIntensities] = useState<IOptionsSelect[]>([]);
 	// const [weeks, setWeeks] = useState<IOptionsSelect[]>([]);
 	// const [frequencies, setFrequencies] = useState<IOptionsSelect[]>([]);
@@ -69,15 +76,19 @@ const Form: React.FC = () => {
 		history.push("/app/leaners");
 	};
 
-	const getGenderOptions = async () => {
-		const response = await api.get<IOptionsSelect[]>("/genders");
-		setGenders(response.data);
+	const getCategories = async () => {
+		const response = await api.get<IOptionsSelect[]>("/muscles");
+		setCategories(response.data);
 	};
 
-	// const getPlansOptions = async () => {
-	// 	const response = await api.get<IOptionsSelect[]>("/plans");
-	// 	setPlans(response.data);
-	// };
+    const handleExercicies = useCallback(async (event: FormEvent<HTMLSelectElement>) => {
+        event.preventDefault();
+        const { value } = event.currentTarget
+        if(value){
+            const response = await api.get<Exercicie[]>(`/exercicies/muscle/${value}`);
+            setExercicies(response.data);
+        }
+    },[])
 
 	// const getIntensitiesOptions = async () => {
 	// 	const response = await api.get<IOptionsSelect[]>("/intensities");
@@ -98,14 +109,15 @@ const Form: React.FC = () => {
 	// 	const response = await api.get<IOptionsSelect[]>("/frequencies");
 	// 	setFrequencies(response.data);
 	// };
-	// useEffect(() => {
+	useEffect(() => {
+        getCategories()
 	// 	getGenderOptions();
 	// 	getPlansOptions();
 	// 	getIntensitiesOptions();
 	// 	getWeeksOptions();
 	// 	getLocationsOptions();
 	// 	getFrequenciesOptions();
-	// }, []);
+	}, []);
 
 	// const getLeaner = useCallback(
 	// 	async (id: string) => {
@@ -223,11 +235,12 @@ const Form: React.FC = () => {
 								{...register("gender_id")}
 								name="gender_id"
 								className="mt-1"
+                                onChange={(event) => handleExercicies(event)}
 							>
 								<option></option>
-								{genders.map((gender) => (
-									<option key={gender.id} value={gender.id}>
-										{gender.name}
+								{categories.map((category) => (
+									<option key={category.id} value={category.id}>
+										{category.name}
 									</option>
 								))}
 							</Select>
@@ -241,9 +254,9 @@ const Form: React.FC = () => {
 								className="mt-1"
 							>
 								<option></option>
-								{genders.map((gender) => (
-									<option key={gender.id} value={gender.id}>
-										{gender.name}
+								{exercicies && exercicies.map((exercicie) => (
+									<option key={exercicie.id} value={exercicie.id}>
+										{exercicie.name}
 									</option>
 								))}
 							</Select>
@@ -380,7 +393,7 @@ const Form: React.FC = () => {
 				</form>
                 <hr />
 				<div className="bg-white shadow overflow-hidden sm:rounded-md my-4">
-					<ul role="list" className="divide-y divide-gray-200">
+					<ul  className="divide-y divide-gray-200">
 						{positions.map((position) => (
 							<li key={position.id}>
 								<a href="#" className="block hover:bg-gray-50">
