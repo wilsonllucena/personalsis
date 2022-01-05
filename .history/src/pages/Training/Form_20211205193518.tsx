@@ -10,9 +10,9 @@ import {
 	CalendarIcon,
 	LocationMarkerIcon,
 	UsersIcon,
-	PencilIcon,
-	ChartBarIcon,
-	RefreshIcon,
+    PencilIcon,
+    ChartBarIcon,
+    RefreshIcon
 } from "@heroicons/react/solid";
 
 interface ILeanerInputsForm {
@@ -42,7 +42,7 @@ interface Leaner {
 }
 
 interface Exercicie {
-	id: number;
+    id: number;
 	name: string;
 	url: string;
 }
@@ -58,7 +58,7 @@ const Form: React.FC = () => {
 	const [genders, setGenders] = useState<IOptionsSelect[]>([]);
 
 	const [categories, setCategories] = useState<IOptionsSelect[]>([]);
-	const [exercicies, setExercicies] = useState<Exercicie[]>([]);
+    const [exercicies, setExercicies] = useState<Exercicie[]>([]);
 	// const [intensities, setIntensities] = useState<IOptionsSelect[]>([]);
 	// const [weeks, setWeeks] = useState<IOptionsSelect[]>([]);
 	// const [frequencies, setFrequencies] = useState<IOptionsSelect[]>([]);
@@ -76,25 +76,20 @@ const Form: React.FC = () => {
 		history.push("/app/leaners");
 	};
 
+    const handleExercicies = useCallback(async (id:number) => {
+        const response = await api.get<Exercicie[]>(`/exercicies/muscle/${id}`);
+		setExercicies(response.data);
+    },[])
+
+	const getGenderOptions = async () => {
+		const response = await api.get<IOptionsSelect[]>("/genders");
+		setGenders(response.data);
+	};
+
 	const getCategories = async () => {
 		const response = await api.get<IOptionsSelect[]>("/muscles");
 		setCategories(response.data);
 	};
-
-	const handleExercicies = useCallback(
-		async (event: FormEvent<HTMLSelectElement>) => {
-			event.preventDefault();
-			const { value } = event.currentTarget;
-			if (value) {
-				const response = await api.get<Exercicie[]>(
-					`/exercicies/muscle/${value}`
-				);
-				setExercicies(response.data);
-				getCategories();
-			}
-		},
-		[]
-	);
 
 	// const getIntensitiesOptions = async () => {
 	// 	const response = await api.get<IOptionsSelect[]>("/intensities");
@@ -116,13 +111,13 @@ const Form: React.FC = () => {
 	// 	setFrequencies(response.data);
 	// };
 	useEffect(() => {
-		getCategories();
-		// 	getGenderOptions();
-		// 	getPlansOptions();
-		// 	getIntensitiesOptions();
-		// 	getWeeksOptions();
-		// 	getLocationsOptions();
-		// 	getFrequenciesOptions();
+        getCategories()
+	// 	getGenderOptions();
+	// 	getPlansOptions();
+	// 	getIntensitiesOptions();
+	// 	getWeeksOptions();
+	// 	getLocationsOptions();
+	// 	getFrequenciesOptions();
 	}, []);
 
 	// const getLeaner = useCallback(
@@ -135,8 +130,8 @@ const Form: React.FC = () => {
 
 	useEffect(() => {
 		if (id) {
-			const getLeaner = async (id: string) => {
-				const response = await api.get(`/leaners/${id}`);
+			const getLeaner = async (event: FormEvent) => {
+				const response = await api.get(`/leaners/${event.target}`);
 				setLeaner(response.data);
 			};
 			getLeaner(id);
@@ -238,17 +233,14 @@ const Form: React.FC = () => {
 							<span>Categoria</span>
 							<Select
 								css=""
-								{...register("muscle_id")}
-								name="muscle_id"
+								{...register("gender_id")}
+                                onClick={(event) => handleExercicies(event)}
+								name="gender_id"
 								className="mt-1"
-								onChange={(event) => handleExercicies(event)}
 							>
 								<option></option>
 								{categories.map((category) => (
-									<option
-										key={category.id}
-										value={category.id}
-									>
+									<option key={category.id} value={category.id}>
 										{category.name}
 									</option>
 								))}
@@ -263,15 +255,11 @@ const Form: React.FC = () => {
 								className="mt-1"
 							>
 								<option></option>
-								{exercicies &&
-									exercicies.map((exercicie) => (
-										<option
-											key={exercicie.id}
-											value={exercicie.id}
-										>
-											{exercicie.name}
-										</option>
-									))}
+								{genders.map((gender) => (
+									<option key={gender.id} value={gender.id}>
+										{gender.name}
+									</option>
+								))}
 							</Select>
 						</Label>
 					</div>
@@ -404,9 +392,9 @@ const Form: React.FC = () => {
 						</Button>
 					</div>
 				</form>
-				<hr />
+                <hr />
 				<div className="bg-white shadow overflow-hidden sm:rounded-md my-4">
-					<ul className="divide-y divide-gray-200">
+					<ul  className="divide-y divide-gray-200">
 						{positions.map((position) => (
 							<li key={position.id}>
 								<a href="#" className="block hover:bg-gray-50">
@@ -431,7 +419,7 @@ const Form: React.FC = () => {
 													/>
 													{position.location}
 												</p>
-												<p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                                                <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
 													<PencilIcon
 														className="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"
 														aria-hidden="true"

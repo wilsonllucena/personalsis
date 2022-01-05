@@ -238,8 +238,8 @@ const Form: React.FC = () => {
 							<span>Categoria</span>
 							<Select
 								css=""
-								{...register("muscle_id")}
-								name="muscle_id"
+								{...register("gender_id")}
+								name="gender_id"
 								className="mt-1"
 								onChange={(event) => handleExercicies(event)}
 							>
